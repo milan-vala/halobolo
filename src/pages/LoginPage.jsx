@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { Typography } from "@mui/material";
@@ -7,17 +8,18 @@ import Button from "@mui/material/Button";
 import { loginApi } from "../API/login";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const signin = async (payload) => {
     const response = await loginApi(payload.username, payload.password);
     if (response?.status === 200) {
-      console.log(response.data)
+      console.log(response.data);
       localStorage.setItem("token", JSON.stringify(response.data.token));
       localStorage.setItem("role", JSON.stringify(response.data.role));
       localStorage.setItem("isLoggedIn", JSON.stringify(true));
-      console.log("login token =>", response.data.token)
+      console.log("login token =>", response.data.token);
       window.location.replace("/home");
     } else {
-      console.log("something went wrong!")
+      console.log("something went wrong!");
     }
   };
 
@@ -31,6 +33,11 @@ const LoginPage = () => {
       signin(values);
     },
   });
+
+  useEffect(() => {
+    const isLoggedIn = JSON.parse(localStorage.getItem("token"));
+    if (isLoggedIn) navigate("/home");
+  }, []);
 
   return (
     <Box

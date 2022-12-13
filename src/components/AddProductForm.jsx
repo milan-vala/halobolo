@@ -10,8 +10,14 @@ import * as Yup from "yup";
 
 const AddProductForm = ({ isModalVisible, setIsModalVisible, formData }) => {
   const [loading, setLoading] = useState(false);
+  const [filesLen, setFilesLen] = useState(0);
+  const [productImages, setProductImages] = useState([]);
 
   const addProduct = async (payload) => {
+    if (filesLen > 5) {
+      alert("please add max 5 files only");
+      return;
+    }
     setLoading(true);
     try {
       const response = await addProductApi(payload);
@@ -26,6 +32,10 @@ const AddProductForm = ({ isModalVisible, setIsModalVisible, formData }) => {
   };
 
   const updateProduct = async (id, payload) => {
+    if (filesLen > 5) {
+      alert("please add max 5 files only");
+      return;
+    }
     setLoading(true);
     try {
       const imageArray = payload.images?.filter((item) => item.length > 0);
@@ -49,31 +59,18 @@ const AddProductForm = ({ isModalVisible, setIsModalVisible, formData }) => {
       name: "",
       price: 0,
       qty: 0,
-      imageOne: "",
-      imageTwo: "",
-      imageThree: "",
-      imageFour: "",
-      imageFive: "",
     },
     validationSchema: Yup.object({
       name: Yup.string().required("name is required"),
       price: Yup.number().typeError("please enter number only").required(),
       qty: Yup.number().typeError("please enter number only").required(),
-      imageOne: Yup.string().required("please select atlease one image"),
     }),
     onSubmit: (values) => {
-      const images = [
-        values.imageOne,
-        values.imageTwo,
-        values.imageThree,
-        values.imageFour,
-        values.imageFive,
-      ];
       const payload = {
         name: values.name,
         price: values.price,
         qty: values.qty,
-        images: images,
+        images: productImages,
       };
       !formData ? addProduct(payload) : updateProduct(formData.id, payload);
     },
@@ -81,21 +78,28 @@ const AddProductForm = ({ isModalVisible, setIsModalVisible, formData }) => {
 
   useEffect(() => {
     if (formData) {
-      const images = formData.images;
       formik.setValues({
         name: formData.name,
         price: formData.price,
         qty: formData.qty,
-        imageOne: images?.length > 0 ? formData?.images[0] : "",
-        imageTwo: images?.length > 1 ? formData?.images[1] : "",
-        imageThree: images?.length > 2 ? formData?.images[2] : "",
-        imageFour: images?.length > 3 ? formData?.images[3] : "",
-        imageFive: images?.length > 4 ? formData?.images[4] : "",
       });
     } else {
       formik.resetForm();
     }
   }, [formData]);
+
+  const handleFileChange = (event) => {
+    setFilesLen(Array.from(event.target.files).length);
+    if (Array.from(event.target.files).length > 5) {
+      event.preventDefault();
+      alert(`you can upload max ${5} images.`);
+      return;
+    } else {
+      const files = Object.values(event.target.files);
+      const fileNames = files.map((file) => file.name);
+      setProductImages(fileNames);
+    }
+  };
 
   return (
     <Dialog
@@ -145,56 +149,11 @@ const AddProductForm = ({ isModalVisible, setIsModalVisible, formData }) => {
           {formik.touched.qty && formik.errors.qty && (
             <span style={{ color: "red" }}>{formik.errors.qty}</span>
           )}
-          <TextField
-            name="imageOne"
-            type="text"
-            label="Product Image 1"
-            variant="outlined"
-            sx={{ mt: 4 }}
-            value={formik.values.imageOne}
-            onChange={formik.handleChange}
-            error={
-              formik.touched.imageOne && formik.errors.imageOne ? true : false
-            }
-          />
-          {formik.touched.imageOne && formik.errors.imageOne && (
-            <span style={{ color: "red" }}>{formik.errors.imageOne}</span>
-          )}
-          <TextField
-            name="imageTwo"
-            type="text"
-            label="Product Image 2"
-            variant="outlined"
-            sx={{ mt: 4 }}
-            value={formik.values.imageTwo}
-            onChange={formik.handleChange}
-          />
-          <TextField
-            name="imageThree"
-            type="text"
-            label="Product Image 3"
-            variant="outlined"
-            sx={{ mt: 4 }}
-            value={formik.values.imageThree}
-            onChange={formik.handleChange}
-          />
-          <TextField
-            name="imageFour"
-            type="text"
-            label="Product Image 4"
-            variant="outlined"
-            sx={{ mt: 4 }}
-            value={formik.values.imageFour}
-            onChange={formik.handleChange}
-          />
-          <TextField
-            name="imageFive"
-            type="text"
-            label="Product Image 5"
-            variant="outlined"
-            sx={{ mt: 4 }}
-            value={formik.values.imageFive}
-            onChange={formik.handleChange}
+          <input
+            type="file"
+            multiple
+            accept="image/jpg"
+            onChange={handleFileChange}
           />
         </Box>
       </DialogContent>

@@ -41,9 +41,38 @@ const ProductDetailPage = () => {
   };
 
   const addQuantity = () => {
-    if (product.qty > 0 && quantity < product.qty)
+    if (product.qty > 0 && quantity < product.qty) {
       setQuantity((prevQty) => prevQty + 1);
-    else alert("you can not add more than available stock.");
+      const userCart = localStorage.getItem("cart");
+      if (userCart) {
+        const cartObj = JSON.parse(userCart);
+        if (cartObj[id]) {
+          localStorage.setItem(
+            "cart",
+            JSON.stringify({
+              ...cartObj,
+              [id]: { qty: (cartObj[id].qty += 1), productId: id },
+            })
+          );
+        } else {
+          console.log("id not matching");
+          localStorage.setItem(
+            "cart",
+            JSON.stringify({
+              ...cartObj,
+              [id]: { qty: 1, productId: id },
+            })
+          );
+        }
+      } else {
+        localStorage.setItem(
+          "cart",
+          JSON.stringify({ [id]: { qty: 1, productId: id } })
+        );
+      }
+    } else {
+      alert("you can not add more than available stock.");
+    }
   };
 
   const addToCart = async () => {
@@ -74,8 +103,17 @@ const ProductDetailPage = () => {
   };
 
   const removeQuantity = () => {
-    if (quantity > 0) setQuantity((prevQty) => prevQty - 1);
-    else alert("please add quantity");
+    if (quantity > 0) {
+      setQuantity((prevQty) => prevQty - 1);
+      const cartQty = localStorage.getItem("cartQty");
+      const updatedQty = cartQty < 1 ? 0 : parseInt(cartQty) - 1;
+      localStorage.setItem(
+        "userCart",
+        JSON.stringify({ qty: updatedQty, productId: id })
+      );
+    } else {
+      alert("please add quantity");
+    }
   };
 
   const removeFromCart = async () => {

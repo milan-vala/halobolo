@@ -15,6 +15,11 @@ const Header = () => {
   };
   const cartQty = localStorage.getItem("cartQty");
 
+  const goToCart = () => {
+    const product = localStorage.getItem("cart");
+    console.log("product in cart with qty =>", JSON.parse(product));
+  };
+
   return (
     <div
       style={{
@@ -27,7 +32,7 @@ const Header = () => {
       }}
     >
       <Badge badgeContent={cartQty} color="secondary">
-        <ShoppingCartIcon />
+        <ShoppingCartIcon onClick={goToCart} />
       </Badge>
       <Button variant="outlined" onClick={logout} sx={{ ml: 3 }}>
         <Typography variant="body">Log out</Typography>

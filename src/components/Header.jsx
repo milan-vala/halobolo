@@ -33,11 +33,13 @@ const Header = () => {
         alignItems: "center",
       }}
     >
-      <Box onClick={goToCart} sx={{ cursor: "pointer" }}>
-        <Badge badgeContent={cartQty} color="secondary">
-          <ShoppingCartIcon />
-        </Badge>
-      </Box>
+      {JSON.parse(localStorage.getItem("role")) !== "admin" && (
+        <Box onClick={goToCart} sx={{ cursor: "pointer" }}>
+          <Badge badgeContent={cartQty} color="secondary">
+            <ShoppingCartIcon />
+          </Badge>
+        </Box>
+      )}
       <Button variant="outlined" onClick={logout} sx={{ ml: 3 }}>
         <Typography variant="body">Log out</Typography>
       </Button>

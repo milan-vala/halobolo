@@ -15,7 +15,7 @@ const ProductDetailPage = () => {
   const [cartProducts, setCartProducts] = useState([]);
   const [quantity, setQuantity] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [role, setRole] = useState("");
   const [formData, setFormData] = useState({});
   const { id } = useParams();
   const navigate = useNavigate();
@@ -207,9 +207,12 @@ const ProductDetailPage = () => {
   };
 
   useEffect(() => {
-    getCartProducts();
+    if (JSON.parse(localStorage.getItem("role")) !== "admin") {
+      getCartProducts();
+      setProductQtys();
+    }
     getProduct();
-    setProductQtys();
+    setRole(JSON.parse(localStorage.getItem("role")));
   }, []);
 
   return !loading ? (
@@ -263,95 +266,101 @@ const ProductDetailPage = () => {
               <Typography variant="h6" sx={{ ml: 2 }}>
                 You're adding: {quantity}
               </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  pt: 2,
-                  px: 5,
-                }}
-              >
-                <Button
-                  variant="contained"
-                  endIcon={<AddIcon />}
-                  onClick={addQuantity}
-                >
-                  <Typography variant="body">Add Quantity</Typography>
-                </Button>
-                <Button
-                  variant="outlined"
-                  endIcon={<RemoveIcon />}
-                  color="error"
-                  sx={{ ml: 2 }}
-                  onClick={removeQuantity}
-                >
-                  <Typography variant="body">Remove Quantity</Typography>
-                </Button>
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  pt: 2,
-                  px: 5,
-                }}
-              >
-                <Button
-                  variant="contained"
-                  endIcon={<AddIcon />}
-                  onClick={addToCart}
-                >
-                  <Typography variant="body">Add to cart</Typography>
-                </Button>
-                <Button
-                  variant="outlined"
-                  endIcon={<RemoveIcon />}
-                  color="error"
-                  sx={{ ml: 2 }}
-                  onClick={removeFromCart}
-                >
-                  <Typography variant="body">Remove from cart</Typography>
-                </Button>
-              </Box>
+              {role !== "admin" && (
+                <>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      pt: 2,
+                      px: 5,
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      endIcon={<AddIcon />}
+                      onClick={addQuantity}
+                    >
+                      <Typography variant="body">Add Quantity</Typography>
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      endIcon={<RemoveIcon />}
+                      color="error"
+                      sx={{ ml: 2 }}
+                      onClick={removeQuantity}
+                    >
+                      <Typography variant="body">Remove Quantity</Typography>
+                    </Button>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      pt: 2,
+                      px: 5,
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      endIcon={<AddIcon />}
+                      onClick={addToCart}
+                    >
+                      <Typography variant="body">Add to cart</Typography>
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      endIcon={<RemoveIcon />}
+                      color="error"
+                      sx={{ ml: 2 }}
+                      onClick={removeFromCart}
+                    >
+                      <Typography variant="body">Remove from cart</Typography>
+                    </Button>
+                  </Box>
+                </>
+              )}
             </div>
           </Box>
         </Paper>
-        <Box
-          sx={{
-            mt: 5,
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-          }}
-        >
-          <Button
-            variant="contained"
-            onClick={() => {
-              setFormData(undefined);
-              setIsModalVisible(true);
+        {role === "admin" && (
+          <Box
+            sx={{
+              mt: 5,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-evenly",
             }}
           >
-            <Typography variant="body">Add product</Typography>
-          </Button>
-          <Button
-            variant="contained"
-            color="info"
-            sx={{ ml: 2 }}
-            onClick={() => updateProduct()}
-          >
-            <Typography variant="body">Update product</Typography>
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            sx={{ ml: 2 }}
-            onClick={() => confirmDelete()}
-          >
-            <Typography variant="body">Delete product</Typography>
-          </Button>
-        </Box>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setFormData(undefined);
+                setIsModalVisible(true);
+              }}
+            >
+              <Typography variant="body">Add product</Typography>
+            </Button>
+            <Button
+              variant="contained"
+              color="info"
+              sx={{ ml: 2 }}
+              onClick={() => updateProduct()}
+            >
+              <Typography variant="body">Update product</Typography>
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ ml: 2 }}
+              onClick={() => confirmDelete()}
+            >
+              <Typography variant="body">Delete product</Typography>
+            </Button>
+          </Box>
+        )}
       </Box>
 
       <AddProductForm

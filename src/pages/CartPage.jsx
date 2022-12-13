@@ -72,6 +72,7 @@ const CartPage = () => {
       if (response?.message) {
         alert(response.message);
         localStorage.setItem("cartQty", JSON.stringify(0));
+        localStorage.removeItem("cart");
       }
     } catch (error) {
       console.warn("Error: Error while buying products -", error);

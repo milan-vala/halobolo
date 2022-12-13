@@ -4,13 +4,6 @@ const token = JSON.parse(localStorage.getItem("token"));
 axios.defaults.headers.common['Authorization'] = token
 const baseURL = process.env.REACT_APP_BASE_URL;
 
-// const authApis = axios.create({
-//   baseURL: "https://www.test.halobolo.com/",
-//   headers: {
-//     Authorization: `Bearer ${token}`,
-//   },
-// });
-
 export const POST = async (endpoint, data) => {
   return axios
     .post(baseURL + endpoint, data)

@@ -1,19 +1,24 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Box, Paper, Typography, Button } from "@mui/material";
-import { getProductApi } from "../API/products";
+import { getProductApi, deleteProductApi } from "../API/products";
 import { addToCartApi, removeFromCartApi, cartListApi } from "../API/cart";
 import Loader from "../components/Loader";
 import Header from "../components/Header";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import AddProductForm from "../components/AddProductForm";
 
 const ProductDetailPage = () => {
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(false);
   const [cartProducts, setCartProducts] = useState([]);
   const [quantity, setQuantity] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [formData, setFormData] = useState({});
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const getCartProducts = async () => {
     try {
@@ -169,6 +174,38 @@ const ProductDetailPage = () => {
     }
   };
 
+  const updateProduct = () => {
+    setIsModalVisible(true);
+    const images =
+      product.images?.length > 0 ? product.images.map((image) => image) : [];
+    const formData = {
+      id: id,
+      name: product.name,
+      qty: product.qty,
+      price: product.price,
+      images,
+    };
+    setFormData(formData);
+  };
+
+  const deleteProduct = async () => {
+    setLoading(true);
+    try {
+      const response = await deleteProductApi(id);
+      if (response?.success) alert(response.message);
+      navigate("/home");
+    } catch (error) {
+      console.warn("Error: Error while deleting product -", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmDelete = () => {
+    const data = window.confirm("Are you sure you want to delete?");
+    if (data) deleteProduct();
+  };
+
   useEffect(() => {
     getCartProducts();
     getProduct();
@@ -184,6 +221,7 @@ const ProductDetailPage = () => {
           justifyContent: "center",
           alignItems: "center",
           minHeight: "40vh",
+          flexDirection: "column",
         }}
       >
         <Paper elevation={2} sx={{ p: 5 }}>
@@ -280,7 +318,47 @@ const ProductDetailPage = () => {
             </div>
           </Box>
         </Paper>
+        <Box
+          sx={{
+            mt: 5,
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={() => {
+              setFormData(undefined);
+              setIsModalVisible(true);
+            }}
+          >
+            <Typography variant="body">Add product</Typography>
+          </Button>
+          <Button
+            variant="contained"
+            color="info"
+            sx={{ ml: 2 }}
+            onClick={() => updateProduct()}
+          >
+            <Typography variant="body">Update product</Typography>
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            sx={{ ml: 2 }}
+            onClick={() => confirmDelete()}
+          >
+            <Typography variant="body">Delete product</Typography>
+          </Button>
+        </Box>
       </Box>
+
+      <AddProductForm
+        isModalVisible={isModalVisible}
+        setIsModalVisible={setIsModalVisible}
+        formData={formData}
+      />
     </div>
   ) : (
     <Loader />

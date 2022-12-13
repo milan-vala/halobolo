@@ -5,10 +5,13 @@ import Header from "../components/Header";
 import { cartListApi } from "../API/cart";
 import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import { buyProductsApi } from "../API/cart";
+import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
+
+  const navigate = useNavigate();
 
   const getCartProducts = async () => {
     setLoading(true);
@@ -156,6 +159,14 @@ const CartPage = () => {
               onClick={() => buyAll()}
             >
               <Typography variant="body">Buy all</Typography>
+            </Button>
+            <Button
+              onClick={() => navigate("/home")}
+              variant="contained"
+              color="info"
+              sx={{ ml: 3 }}
+            >
+              Go Home
             </Button>
           </Box>
         </Box>

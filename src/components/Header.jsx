@@ -1,9 +1,12 @@
-import { Button, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { logoutApi } from "../API/login";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Badge from "@mui/material/Badge";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
+
   const logout = async () => {
     const response = await logoutApi();
     if (response?.status === 200) {
@@ -16,8 +19,7 @@ const Header = () => {
   const cartQty = localStorage.getItem("cartQty");
 
   const goToCart = () => {
-    const product = localStorage.getItem("cart");
-    console.log("product in cart with qty =>", JSON.parse(product));
+    navigate("/cart");
   };
 
   return (
@@ -31,9 +33,11 @@ const Header = () => {
         alignItems: "center",
       }}
     >
-      <Badge badgeContent={cartQty} color="secondary">
-        <ShoppingCartIcon onClick={goToCart} />
-      </Badge>
+      <Box onClick={goToCart} sx={{ cursor: "pointer" }}>
+        <Badge badgeContent={cartQty} color="secondary">
+          <ShoppingCartIcon />
+        </Badge>
+      </Box>
       <Button variant="outlined" onClick={logout} sx={{ ml: 3 }}>
         <Typography variant="body">Log out</Typography>
       </Button>

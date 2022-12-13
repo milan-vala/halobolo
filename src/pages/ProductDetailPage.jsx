@@ -55,7 +55,6 @@ const ProductDetailPage = () => {
             })
           );
         } else {
-          console.log("id not matching");
           localStorage.setItem(
             "cart",
             JSON.stringify({
@@ -79,7 +78,14 @@ const ProductDetailPage = () => {
     const isProductInCart = cartProducts.filter(
       (product) => product._id._id == id
     );
-    // if (product.qty > 0 && quantity < product.qty) {
+    if (product.qty < 1) {
+      alert("no quantity available");
+      return;
+    }
+    if (quantity < 1) {
+      alert("add some quantity first");
+      return;
+    }
     if (!isProductInCart?.length) {
       setLoading(true);
       const payload = {
@@ -97,7 +103,6 @@ const ProductDetailPage = () => {
       }
     } else {
       alert("product is already available in cart.");
-      // alert("you can not add more then available stock.");
     }
     getCartProducts();
   };
@@ -105,12 +110,27 @@ const ProductDetailPage = () => {
   const removeQuantity = () => {
     if (quantity > 0) {
       setQuantity((prevQty) => prevQty - 1);
-      const cartQty = localStorage.getItem("cartQty");
-      const updatedQty = cartQty < 1 ? 0 : parseInt(cartQty) - 1;
-      localStorage.setItem(
-        "userCart",
-        JSON.stringify({ qty: updatedQty, productId: id })
-      );
+      const userCart = localStorage.getItem("cart");
+      if (userCart) {
+        const cartObj = JSON.parse(userCart);
+        if (cartObj[id]) {
+          localStorage.setItem(
+            "cart",
+            JSON.stringify({
+              ...cartObj,
+              [id]: { qty: (cartObj[id].qty -= 1), productId: id },
+            })
+          );
+        } else {
+          localStorage.setItem(
+            "cart",
+            JSON.stringify({
+              ...cartObj,
+              [id]: { qty: 0, productId: id },
+            })
+          );
+        }
+      }
     } else {
       alert("please add quantity");
     }
@@ -142,9 +162,17 @@ const ProductDetailPage = () => {
     getCartProducts();
   };
 
+  const setProductQtys = () => {
+    const cart = JSON.parse(localStorage.getItem("cart"));
+    if (cart && cart[id]) {
+      setQuantity(cart[id].qty);
+    }
+  };
+
   useEffect(() => {
     getCartProducts();
     getProduct();
+    setProductQtys();
   }, []);
 
   return !loading ? (

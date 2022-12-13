@@ -8,6 +8,7 @@ import UnauthLayout from "./components/UnauthLayout";
 import { NotMatch } from "./pages/NotMatch";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import CartPage from "./pages/CartPage";
 
 function App() {
   const { isLoggedIn } = useContext(AppContext);
@@ -32,6 +33,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ProductDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <CartPage />
             </ProtectedRoute>
           }
         />
